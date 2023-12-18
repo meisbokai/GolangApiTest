@@ -58,7 +58,7 @@ func (s *APIServer) Run() {
 
 	router.HandleFunc("/user", makeHTTPHandleFunc(s.handleUser))
 
-	router.HandleFunc("/user/{id}", makeHTTPHandleFunc(s.handleGetUser))
+	router.HandleFunc("/user/{id}", makeHTTPHandleFunc(s.handleGetUserById))
 
 	log.Println("JSON API server started on port: ", s.listenAddress)
 
@@ -82,6 +82,15 @@ func (s *APIServer) handleUser(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (s *APIServer) handleGetUser(w http.ResponseWriter, r *http.Request) error {
+	users, err := s.store.GetUsers()
+	if err != nil {
+		return err
+	}
+
+	return WriteJSON(w, http.StatusOK, users)
+}
+
+func (s *APIServer) handleGetUserById(w http.ResponseWriter, r *http.Request) error {
 	// TODO: implement the function
 	user := NewUser("testuser", "testemail@example.com")
 
@@ -95,7 +104,17 @@ func (s *APIServer) handleGetUser(w http.ResponseWriter, r *http.Request) error 
 
 func (s *APIServer) handleCreateUser(w http.ResponseWriter, r *http.Request) error {
 	// TODO: implement the function
-	return nil
+	createUserRequest := new(CreateUserRequest)
+	if err := json.NewDecoder(r.Body).Decode(createUserRequest); err != nil {
+		return err
+	}
+
+	user := NewUser(createUserRequest.Username, createUserRequest.Email)
+	if err := s.store.CreateUser(user); err != nil {
+		return err
+	}
+
+	return WriteJSON(w, http.StatusOK, user)
 }
 
 func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) error {
