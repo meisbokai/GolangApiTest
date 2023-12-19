@@ -75,6 +75,10 @@ func (s *APIServer) handleUser(w http.ResponseWriter, r *http.Request) error {
 		return s.handleCreateUser(w, r)
 	case "PUT":
 		return s.handleUpdateUser(w, r)
+func (s *APIServer) handleUserByID(w http.ResponseWriter, r *http.Request) error {
+	switch r.Method {
+	case "GET":
+		return s.handleGetUserById(w, r)
 	case "DELETE":
 		return s.handleDeleteUser(w, r)
 	}
@@ -93,11 +97,18 @@ func (s *APIServer) handleGetUser(w http.ResponseWriter, r *http.Request) error 
 func (s *APIServer) handleGetUserById(w http.ResponseWriter, r *http.Request) error {
 	id, err := getID(r)
 	if err != nil {
+		return err
+	}
+
 	log.Println("Get user with id: ", id)
 
-	jsonUser := WriteJSON(w, http.StatusOK, user)
+	// Get user from database
+	user, err := s.store.GetUserByID(id)
+	if err != nil {
+		return err
+	}
 
-	return jsonUser
+	return WriteJSON(w, http.StatusOK, user)
 }
 
 func (s *APIServer) handleCreateUser(w http.ResponseWriter, r *http.Request) error {

@@ -67,7 +67,22 @@ func (s *PostgresStorage) DeleteUser(id int) error {
 	return nil
 }
 func (s *PostgresStorage) GetUserByID(id int) (*User, error) {
-	return nil, nil
+	// Assume that ID is unique since it is a primary key in the db.
+	// Query for a single row
+	row := s.db.QueryRow(`select * from users where id = $1`, id)
+
+	user := new(User)
+	err := row.Scan(
+		&user.ID,
+		&user.Username,
+		&user.Email,
+		&user.CreatedAt)
+
+	if err != nil {
+		return nil, fmt.Errorf("User with ID %d not found", id)
+	}
+
+	return user, nil
 }
 
 func (s *PostgresStorage) GetUsers() ([]*User, error) {
