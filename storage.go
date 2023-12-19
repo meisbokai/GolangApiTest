@@ -64,7 +64,15 @@ func (s *PostgresStorage) UpdateUser(*User) error {
 	return nil
 }
 func (s *PostgresStorage) DeleteUser(id int) error {
-	return nil
+	// Exclude Soft Delete. Maybe can include as additional feature. Soft Delete -> Flag row as deleted, but do not actually remove row
+	_, err := s.db.Exec(`DELETE FROM users WHERE id=$1`, id)
+
+	return err
+	// if err != nil {
+	// 	return fmt.Errorf("User with ID %d not found. Unable to delete", id)
+	// }
+
+	// return nil
 }
 func (s *PostgresStorage) GetUserByID(id int) (*User, error) {
 	// Assume that ID is unique since it is a primary key in the db.

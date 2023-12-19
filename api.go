@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -23,7 +24,7 @@ func WriteJSON(w http.ResponseWriter, status int, v any) error {
 type apiFunc func(http.ResponseWriter, *http.Request) error
 
 type ApiError struct {
-	Error string
+	Error string `json:"error"`
 }
 
 // Decorate all apiFuncs into a http handlerFunc
@@ -58,7 +59,7 @@ func (s *APIServer) Run() {
 
 	router.HandleFunc("/user", makeHTTPHandleFunc(s.handleUser))
 
-	router.HandleFunc("/user/{id}", makeHTTPHandleFunc(s.handleGetUserById))
+	router.HandleFunc("/user/{id}", makeHTTPHandleFunc(s.handleUserByID))
 
 	log.Println("JSON API server started on port: ", s.listenAddress)
 
@@ -75,6 +76,10 @@ func (s *APIServer) handleUser(w http.ResponseWriter, r *http.Request) error {
 		return s.handleCreateUser(w, r)
 	case "PUT":
 		return s.handleUpdateUser(w, r)
+	}
+	return fmt.Errorf("unsupported method %s", r.Method)
+}
+
 func (s *APIServer) handleUserByID(w http.ResponseWriter, r *http.Request) error {
 	switch r.Method {
 	case "GET":
@@ -112,7 +117,8 @@ func (s *APIServer) handleGetUserById(w http.ResponseWriter, r *http.Request) er
 }
 
 func (s *APIServer) handleCreateUser(w http.ResponseWriter, r *http.Request) error {
-	// TODO: implement the function
+	// Note: new(x) and &x{} is the same. Returns a pointer to x
+	// Note: Use new(x) if x is a basic type. Cannot use &int{0}.
 	createUserRequest := new(CreateUserRequest)
 	if err := json.NewDecoder(r.Body).Decode(createUserRequest); err != nil {
 		return err
@@ -131,8 +137,21 @@ func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) err
 	return nil
 }
 func (s *APIServer) handleDeleteUser(w http.ResponseWriter, r *http.Request) error {
+	// Delete user from database
 	id, err := getID(r)
 	if err != nil {
+		return err
+	}
+
+	log.Println("Delete user with id: ", id)
+
+	if err := s.store.DeleteUser(id); err != nil {
+		return err
+	}
+
+	return WriteJSON(w, http.StatusOK, map[string]int{"deleted": id})
+}
+
 func getID(r *http.Request) (int, error) {
 	// Note: ParseInt is faster, but requires additional parse from int64 -> int
 	// Note: Atoi is slightly slower, but directly convert to int
