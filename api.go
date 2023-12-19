@@ -91,10 +91,8 @@ func (s *APIServer) handleGetUser(w http.ResponseWriter, r *http.Request) error 
 }
 
 func (s *APIServer) handleGetUserById(w http.ResponseWriter, r *http.Request) error {
-	// TODO: implement the function
-	user := NewUser("testuser", "testemail@example.com")
-
-	id := mux.Vars(r)["id"]
+	id, err := getID(r)
+	if err != nil {
 	log.Println("Get user with id: ", id)
 
 	jsonUser := WriteJSON(w, http.StatusOK, user)
@@ -122,6 +120,18 @@ func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) err
 	return nil
 }
 func (s *APIServer) handleDeleteUser(w http.ResponseWriter, r *http.Request) error {
-	// TODO: implement the function
-	return nil
+	id, err := getID(r)
+	if err != nil {
+func getID(r *http.Request) (int, error) {
+	// Note: ParseInt is faster, but requires additional parse from int64 -> int
+	// Note: Atoi is slightly slower, but directly convert to int
+	// id, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 0) -> int64
+	idStr := mux.Vars(r)["id"]
+	id, err := strconv.Atoi(idStr)
+	// Input validation for 'id' field
+	if err != nil {
+		return 0, fmt.Errorf("Invalid id: %s", idStr)
+	}
+
+	return id, nil
 }
