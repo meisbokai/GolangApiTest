@@ -59,7 +59,7 @@ func (s *APIServer) Run() {
 
 	router.HandleFunc("/user", makeHTTPHandleFunc(s.handleUser))
 
-	router.HandleFunc("/user/{id}", makeHTTPHandleFunc(s.handleUserByID))
+	router.HandleFunc("/user/{id}", WithJWTAuth(makeHTTPHandleFunc(s.handleUserByID), s.store))
 
 	log.Println("JSON API server started on port: ", s.listenAddress)
 
@@ -128,6 +128,14 @@ func (s *APIServer) handleCreateUser(w http.ResponseWriter, r *http.Request) err
 	if err := s.store.CreateUser(user); err != nil {
 		return err
 	}
+
+	// Create token for user
+	tokenString, err := CreateJWTTokenString(user)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("Token String: ", tokenString)
 
 	return WriteJSON(w, http.StatusOK, user)
 }
