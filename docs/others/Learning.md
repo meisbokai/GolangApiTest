@@ -1,0 +1,1 @@
+# Document learning journey while implementing the project
