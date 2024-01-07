@@ -27,7 +27,9 @@ func (r *usersRoutes) Routes() {
 	V1Route := r.router.Group("/v1")
 	{
 		V1Route.GET("/all", r.V1Handler.GetAllUserData)
+		V1Route.POST("/signup", r.V1Handler.CreateUser)
 		V1Route.GET("/email", r.V1Handler.GetUserByEmail)
+
 	}
 
 }

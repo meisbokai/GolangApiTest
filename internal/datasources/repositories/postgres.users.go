@@ -29,6 +29,20 @@ func (r *postgreUserRepository) GetAllUsers(ctx context.Context) (outDom []V1Dom
 	}
 
 	return records.ToArrayOfUsersV1Domain(&userRecords), nil
+}
+
+func (r *postgreUserRepository) CreateUser(ctx context.Context, inDom *V1Domains.UserDomain) (err error) {
+
+	userRecord := records.FromUsersV1Domain(inDom)
+
+	_, err = r.conn.NamedQueryContext(ctx, `INSERT INTO users(id, username, email, password, role_id, created_at) VALUES (uuid_generate_v4(), :username, :email, :password, :role_id, :created_at)`, userRecord)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *postgreUserRepository) GetUserByEmail(ctx context.Context, inDom *V1Domains.UserDomain) (outDomain V1Domains.UserDomain, err error) {
 	userRecord := records.FromUsersV1Domain(inDom)
 

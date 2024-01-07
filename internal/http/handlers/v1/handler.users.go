@@ -1,9 +1,12 @@
 package v1
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 
 	V1Domains "github.com/meisbokai/GolangApiTest/internal/http/domains/v1"
+	"github.com/meisbokai/GolangApiTest/internal/http/requests"
 	"github.com/meisbokai/GolangApiTest/internal/http/responses"
 )
 
@@ -31,6 +34,27 @@ func (userHandler UserHandler) GetAllUserData(ctx *gin.Context) {
 		"user": userResponse,
 	})
 }
+
+func (userHandler UserHandler) CreateUser(ctx *gin.Context) {
+	var userCreateRequest requests.UserCreateRequest
+	if err := ctx.ShouldBindJSON(&userCreateRequest); err != nil {
+		NewErrorResponse(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	userDomain := userCreateRequest.ToV1Domain()
+	userDomainn, statusCode, err := userHandler.usecase.CreateUser(ctx.Request.Context(), userDomain)
+
+	if err != nil {
+		NewErrorResponse(ctx, statusCode, err.Error())
+		return
+	}
+
+	NewSuccessResponse(ctx, statusCode, "registration user success", map[string]interface{}{
+		"user": responses.FromV1Domain(userDomainn),
+	})
+}
+
 func (userHandler UserHandler) GetUserByEmail(ctx *gin.Context) {
 	ctxx := ctx.Request.Context()
 
