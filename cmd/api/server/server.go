@@ -13,8 +13,10 @@ import (
 	"github.com/gin-gonic/gin"
 	config "github.com/meisbokai/GolangApiTest/internal/configs"
 	"github.com/meisbokai/GolangApiTest/internal/constants"
+	"github.com/meisbokai/GolangApiTest/internal/http/middlewares"
 	"github.com/meisbokai/GolangApiTest/internal/http/routes"
 	"github.com/meisbokai/GolangApiTest/internal/util"
+	"github.com/meisbokai/GolangApiTest/pkg/jwt"
 	"github.com/meisbokai/GolangApiTest/pkg/logger"
 	"github.com/sirupsen/logrus"
 )
@@ -34,11 +36,20 @@ func NewServerApp() (*App, error) {
 	// Setup router
 	router := setupRouter()
 
+	// JWT Middleware
+	jwtService := jwt.NewJWTService(config.AppConfig.JWTSecret, config.AppConfig.JWTIssuer, config.AppConfig.JWTExpired)
+
+	// JWT for all users
+	authMiddleware := middlewares.NewAuthMiddleware(jwtService, false)
+
+	// JWT for Admin user only
+	adminAuthMiddleware := middlewares.NewAuthMiddleware(jwtService, true)
+
 	// API Routes
 	api := router.Group("api")
 	api.GET("/", routes.RootHandler)
-	routes.NewUsersRoute(api, conn).Routes()
-	routes.NewAdminRoute(api, conn).Routes()
+	routes.NewUsersRoute(api, conn, jwtService, authMiddleware).Routes()
+	routes.NewAdminRoute(api, conn, jwtService, adminAuthMiddleware).Routes()
 
 	// http Server
 	server := &http.Server{

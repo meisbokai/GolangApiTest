@@ -12,6 +12,10 @@ type Config struct {
 
 	DBPostgreDriver string `mapstructure:"DB_POSTGRE_DRIVER"`
 	DBPostgreDsn    string `mapstructure:"DB_POSTGRE_DSN"`
+
+	JWTSecret  string `mapstructure:"JWT_SECRET"`
+	JWTExpired int    `mapstructure:"JWT_EXPIRED"`
+	JWTIssuer  string `mapstructure:"JWT_ISSUER"`
 }
 
 func InitializeAppConfig() error {
@@ -33,7 +37,7 @@ func InitializeAppConfig() error {
 	}
 
 	// check
-	if AppConfig.Port == 0 || AppConfig.DBPostgreDriver == "" {
+	if AppConfig.Port == 0 || AppConfig.JWTSecret == "" || AppConfig.JWTExpired == 0 || AppConfig.JWTIssuer == "" || AppConfig.DBPostgreDriver == "" {
 		return constants.ErrEmptyVar
 	}
 

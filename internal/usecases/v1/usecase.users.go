@@ -8,15 +8,18 @@ import (
 
 	V1Domains "github.com/meisbokai/GolangApiTest/internal/http/domains/v1"
 	"github.com/meisbokai/GolangApiTest/internal/util"
+	"github.com/meisbokai/GolangApiTest/pkg/jwt"
 )
 
 type userUsecase struct {
-	repo V1Domains.UserRepository
+	repo       V1Domains.UserRepository
+	jwtService jwt.JWTService
 }
 
-func NewUserUsecase(repo V1Domains.UserRepository) V1Domains.UserUsecase {
+func NewUserUsecase(repo V1Domains.UserRepository, jwtService jwt.JWTService) V1Domains.UserUsecase {
 	return &userUsecase{
-		repo: repo,
+		repo:       repo,
+		jwtService: jwtService,
 	}
 }
 
