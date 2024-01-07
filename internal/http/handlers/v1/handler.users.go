@@ -30,5 +30,22 @@ func (userHandler UserHandler) GetAllUserData(ctx *gin.Context) {
 	NewSuccessResponse(ctx, statusCode, "user data fetched successfully", map[string]interface{}{
 		"user": userResponse,
 	})
+}
+func (userHandler UserHandler) GetUserByEmail(ctx *gin.Context) {
+	ctxx := ctx.Request.Context()
+
+	email := ctx.Query("email")
+
+	userDom, statusCode, err := userHandler.usecase.GetUserByEmail(ctxx, email)
+	if err != nil {
+		NewErrorResponse(ctx, statusCode, err.Error())
+		return
+	}
+
+	userResponse := responses.FromV1Domain(userDom)
+
+	NewSuccessResponse(ctx, statusCode, "user data fetched successfully", map[string]interface{}{
+		"user": userResponse,
+	})
 
 }

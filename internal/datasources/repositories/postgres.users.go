@@ -29,5 +29,13 @@ func (r *postgreUserRepository) GetAllUsers(ctx context.Context) (outDom []V1Dom
 	}
 
 	return records.ToArrayOfUsersV1Domain(&userRecords), nil
+func (r *postgreUserRepository) GetUserByEmail(ctx context.Context, inDom *V1Domains.UserDomain) (outDomain V1Domains.UserDomain, err error) {
+	userRecord := records.FromUsersV1Domain(inDom)
 
+	err = r.conn.GetContext(ctx, &userRecord, `SELECT * FROM users WHERE "email" = $1`, userRecord.Email)
+	if err != nil {
+		return V1Domains.UserDomain{}, err
+	}
+
+	return userRecord.ToV1Domain(), nil
 }
