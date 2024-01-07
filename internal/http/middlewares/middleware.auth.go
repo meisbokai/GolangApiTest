@@ -55,6 +55,6 @@ func (m *AuthMiddleware) Handle(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Set("AuthenticatedClaim", claim)
+	ctx.Set(constants.AuthenticatedClaimKey, claim)
 	ctx.Next()
 }

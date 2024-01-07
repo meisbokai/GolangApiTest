@@ -69,10 +69,21 @@ func (r *postgreUserRepository) UpdateUserEmail(ctx context.Context, inDom *V1Do
 func (r *postgreUserRepository) DeleteUser(ctx context.Context, inDom *V1Domains.UserDomain) (err error) {
 	userRecord := records.FromUsersV1Domain(inDom)
 
-	_, err = r.conn.NamedQueryContext(ctx, `DELETE FROM users WHERE email = :email`, userRecord)
+	_, err = r.conn.NamedQueryContext(ctx, `DELETE FROM users WHERE "id" = :id`, userRecord)
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (r *postgreUserRepository) GetUserByID(ctx context.Context, inDom *V1Domains.UserDomain) (outDom V1Domains.UserDomain, err error) {
+	userRecord := records.FromUsersV1Domain(inDom)
+
+	err = r.conn.GetContext(ctx, &userRecord, `SELECT * FROM users WHERE "id" = '$1'`, userRecord.Id)
+	if err != nil {
+		return V1Domains.UserDomain{}, err
+	}
+
+	return userRecord.ToV1Domain(), nil
 }

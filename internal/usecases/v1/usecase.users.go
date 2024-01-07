@@ -75,7 +75,7 @@ func (userUC *userUsecase) UpdateUserEmail(ctx context.Context, oldEmail string,
 	}
 
 	// Check if new email is same as old
-	_, err = util.IsOldEmailMatch(user.Email, newEmail)
+	_, err = util.IsOldEmailMatchNew(user.Email, newEmail)
 	if err != nil {
 		return V1Domains.UserDomain{}, http.StatusBadRequest, err
 	}
@@ -93,10 +93,10 @@ func (userUC *userUsecase) UpdateUserEmail(ctx context.Context, oldEmail string,
 	return user, http.StatusOK, nil
 }
 
-func (userUC *userUsecase) DeleteUser(ctx context.Context, email string) (outDom V1Domains.UserDomain, statusCode int, err error) {
-	user, err := userUC.repo.GetUserByEmail(ctx, &V1Domains.UserDomain{Email: email})
+func (userUC *userUsecase) DeleteUser(ctx context.Context, id string) (outDom V1Domains.UserDomain, statusCode int, err error) {
+	user, err := userUC.repo.GetUserByID(ctx, &V1Domains.UserDomain{ID: id})
 
-	err = userUC.repo.DeleteUser(ctx, &V1Domains.UserDomain{Email: email})
+	err = userUC.repo.DeleteUser(ctx, &V1Domains.UserDomain{ID: id})
 	if err != nil {
 		return V1Domains.UserDomain{}, http.StatusInternalServerError, err
 	}
