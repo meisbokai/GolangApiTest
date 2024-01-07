@@ -141,3 +141,22 @@ func (userHandler UserHandler) Login(ctx *gin.Context) {
 
 	NewSuccessResponse(ctx, statusCode, "login success", responses.FromV1Domain(userDomain))
 }
+
+func (userHandler UserHandler) GetSelfUser(ctx *gin.Context) {
+	// get authenticated user from context
+	userClaims := ctx.MustGet(constants.AuthenticatedClaimKey).(jwt.JwtCustomClaim)
+
+	ctxx := ctx.Request.Context()
+	userDom, statusCode, err := userHandler.usecase.GetUserByID(ctxx, userClaims.UserID)
+	if err != nil {
+		NewErrorResponse(ctx, statusCode, err.Error())
+		return
+	}
+
+	userResponse := responses.FromV1Domain(userDom)
+
+	NewSuccessResponse(ctx, statusCode, "user data fetched successfully", map[string]interface{}{
+		"user": userResponse,
+	})
+
+}

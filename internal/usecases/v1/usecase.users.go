@@ -127,3 +127,12 @@ func (userUC *userUsecase) Login(ctx context.Context, inDom *V1Domains.UserDomai
 
 	return userDomain, http.StatusOK, nil
 }
+
+func (userUC *userUsecase) GetUserByID(ctx context.Context, id string) (outDom V1Domains.UserDomain, statusCode int, err error) {
+	user, err := userUC.repo.GetUserByID(ctx, &V1Domains.UserDomain{ID: id})
+	if err != nil {
+		return V1Domains.UserDomain{}, http.StatusNotFound, errors.New("id not found")
+	}
+
+	return user, http.StatusOK, nil
+}

@@ -37,7 +37,7 @@ func (r *usersRoutes) Routes() {
 		V1UserRoute := V1Route.Group("/users")
 		V1UserRoute.Use(r.authMiddleware)
 		{
-			V1UserRoute.GET("/self", r.V1Handler.GetUserByEmail) // TODO: Find a way to identify the sender without param/body
+			V1UserRoute.GET("/self", r.V1Handler.GetSelfUser) // TODO: Find a way to identify the sender without param/body
 			V1UserRoute.PUT("/updateEmail", r.V1Handler.UpdateUserEmail)
 			V1UserRoute.DELETE("/delete", r.V1Handler.DeleteUser)
 		}

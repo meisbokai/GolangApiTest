@@ -23,6 +23,7 @@ type UserUsecase interface {
 	UpdateUserEmail(ctx context.Context, oldEmail string, newEmail string) (outDom UserDomain, statusCode int, err error)
 	DeleteUser(ctx context.Context, id string) (outDom UserDomain, statusCode int, err error)
 	Login(ctx context.Context, inDom *UserDomain) (outDom UserDomain, statusCode int, err error)
+	GetUserByID(ctx context.Context, id string) (outDom UserDomain, statusCode int, err error)
 }
 
 type UserRepository interface {

@@ -80,7 +80,7 @@ func (r *postgreUserRepository) DeleteUser(ctx context.Context, inDom *V1Domains
 func (r *postgreUserRepository) GetUserByID(ctx context.Context, inDom *V1Domains.UserDomain) (outDom V1Domains.UserDomain, err error) {
 	userRecord := records.FromUsersV1Domain(inDom)
 
-	err = r.conn.GetContext(ctx, &userRecord, `SELECT * FROM users WHERE "id" = '$1'`, userRecord.Id)
+	err = r.conn.GetContext(ctx, &userRecord, `SELECT * FROM users WHERE "id" = $1`, userRecord.Id)
 	if err != nil {
 		return V1Domains.UserDomain{}, err
 	}
