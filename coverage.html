@@ -1,0 +1,623 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>v1: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/meisbokai/GolangApiTest/internal/http/handlers/v1/handler.base_response.go (66.7%)</option>
+				
+				<option value="file1">github.com/meisbokai/GolangApiTest/internal/http/handlers/v1/handler.root.go (100.0%)</option>
+				
+				<option value="file2">github.com/meisbokai/GolangApiTest/internal/http/handlers/v1/handler.users.go (81.6%)</option>
+				
+				<option value="file3">github.com/meisbokai/GolangApiTest/internal/http/middlewares/middleware.auth.go (100.0%)</option>
+				
+				<option value="file4">github.com/meisbokai/GolangApiTest/internal/usecases/v1/usecase.users.go (82.1%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package v1
+
+import (
+        "net/http"
+
+        "github.com/gin-gonic/gin"
+)
+
+type BaseResponse struct {
+        Status  bool        `json:"status"`
+        Message string      `json:"message,omitempty"`
+        Data    interface{} `json:"data,omitempty"`
+}
+
+func NewSuccessResponse(c *gin.Context, statusCode int, message string, data interface{}) <span class="cov8" title="1">{
+        c.JSON(statusCode, BaseResponse{
+                Status:  true,
+                Message: message,
+                Data:    data,
+        })
+}</span>
+
+func NewErrorResponse(c *gin.Context, statusCode int, err string) <span class="cov8" title="1">{
+        c.JSON(statusCode, BaseResponse{
+                Status:  false,
+                Message: err,
+        })
+
+}</span>
+
+func NewAbortResponse(c *gin.Context, message string) <span class="cov0" title="0">{
+        c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"status": false, "message": message})
+}</span>
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package v1
+
+import (
+        "net/http"
+
+        "github.com/gin-gonic/gin"
+)
+
+func Root(c *gin.Context) <span class="cov8" title="1">{
+        c.JSON(http.StatusOK, gin.H{
+                "staus":   true,
+                "message": "v1 online...",
+        })
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package v1
+
+import (
+        "net/http"
+
+        "github.com/gin-gonic/gin"
+
+        "github.com/meisbokai/GolangApiTest/internal/constants"
+        V1Domains "github.com/meisbokai/GolangApiTest/internal/http/domains/v1"
+        "github.com/meisbokai/GolangApiTest/internal/http/requests"
+        "github.com/meisbokai/GolangApiTest/internal/http/responses"
+        "github.com/meisbokai/GolangApiTest/internal/util"
+        "github.com/meisbokai/GolangApiTest/pkg/jwt"
+        "github.com/meisbokai/GolangApiTest/pkg/validators"
+)
+
+type UserHandler struct {
+        usecase V1Domains.UserUsecase
+}
+
+func NewUserHandler(usecase V1Domains.UserUsecase) UserHandler <span class="cov8" title="1">{
+        return UserHandler{
+                usecase: usecase,
+        }
+}</span>
+
+// GetAllUserData godoc
+// @Summary Get all user data
+// @Description Get all user data
+// @Tags Admin
+// @Accept json
+// @Produce json
+// @Success 200 {array} responses.UserResponse "User data"
+// @Failure 401 {object} object{message=string,status=bool} "Unauthorized"
+// @Failure 500 {object} object{message=string,status=bool} "Internal Server Error"
+// @Router /v1/admin/users/all [get]
+// @Security jwtToken
+// @Param Authorization header string true "Insert your access token" default(jwt &lt;Add access token here&gt;)
+func (userHandler UserHandler) GetAllUserData(ctx *gin.Context) <span class="cov8" title="1">{
+        ctxx := ctx.Request.Context()
+        userDom, statusCode, err := userHandler.usecase.GetAllUsers(ctxx)
+        if err != nil </span><span class="cov0" title="0">{
+                NewErrorResponse(ctx, statusCode, err.Error())
+                return
+        }</span>
+
+        <span class="cov8" title="1">userResponse := responses.ToResponseList(userDom)
+
+        NewSuccessResponse(ctx, statusCode, "user data fetched successfully", map[string]interface{}{
+                "user": userResponse,
+        })</span>
+}
+
+// CreateUser godoc
+// @Summary Create a user
+// @Description Create a new user
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param user body requests.UserCreateRequest true "User data"
+// @Success 201 {object} responses.UserResponse "User data"
+// @Failure 400 {object} object{message=string,status=bool}  "Bad Request"
+// @Failure 500 {object} object{message=string,status=bool}  "Internal Server Error"
+// @Router /v1/auth/signup [post]
+func (userHandler UserHandler) CreateUser(ctx *gin.Context) <span class="cov8" title="1">{
+        var userCreateRequest requests.UserCreateRequest
+        if err := ctx.ShouldBindJSON(&amp;userCreateRequest); err != nil </span><span class="cov0" title="0">{
+                NewErrorResponse(ctx, http.StatusBadRequest, err.Error())
+                return
+        }</span>
+
+        <span class="cov8" title="1">if err := validators.ValidatePayloads(userCreateRequest); err != nil </span><span class="cov8" title="1">{
+                NewErrorResponse(ctx, http.StatusBadRequest, err.Error())
+                return
+        }</span>
+
+        <span class="cov8" title="1">userDomain := userCreateRequest.ToV1Domain()
+        userDomainn, statusCode, err := userHandler.usecase.CreateUser(ctx.Request.Context(), userDomain)
+
+        if err != nil </span><span class="cov0" title="0">{
+                NewErrorResponse(ctx, statusCode, err.Error())
+                return
+        }</span>
+
+        <span class="cov8" title="1">NewSuccessResponse(ctx, statusCode, "registration user success", map[string]interface{}{
+                "user": responses.FromV1Domain(userDomainn),
+        })</span>
+}
+
+// GetUserByEmail godoc
+// @Summary Get user by email
+// @Description Get user by email
+// @Tags Admin
+// @Accept json
+// @Produce json
+// @Param email query string true "email"
+// @Success 200 {object} responses.UserResponse "User data"
+// @Failure 404 {object} object{message=string,status=bool}  "Not Found"
+// @Failure 500 {object} object{message=string,status=bool}  "Internal Server Error"
+// @Router /v1/admin/users/email [get]
+// @Security jwtToken
+// @Param Authorization header string true "Insert your access token" default(jwt &lt;Add access token here&gt;)
+func (userHandler UserHandler) GetUserByEmail(ctx *gin.Context) <span class="cov8" title="1">{
+        ctxx := ctx.Request.Context()
+
+        email := ctx.Query("email")
+
+        userDom, statusCode, err := userHandler.usecase.GetUserByEmail(ctxx, email)
+        if err != nil </span><span class="cov8" title="1">{
+                NewErrorResponse(ctx, statusCode, err.Error())
+                return
+        }</span>
+
+        <span class="cov8" title="1">userResponse := responses.FromV1Domain(userDom)
+
+        NewSuccessResponse(ctx, statusCode, "user data fetched successfully", map[string]interface{}{
+                "user": userResponse,
+        })</span>
+}
+
+// UpdateUserEmail godoc
+// @Summary Update user email
+// @Description Update user email based on the authenticated user
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param body body requests.UserUpdateEmailRequest true "Update email request"
+// @Success 200 {object} responses.UserResponse "User data"
+// @Failure 400 {object} object{message=string,status=bool}  "Bad Request"
+// @Failure 401 {object} object{message=string,status=bool}  "Unauthorized"
+// @Failure 500 {object} object{message=string,status=bool}  "Internal Server Error"
+// @Router /v1/users/updateEmail [put]
+// @Security jwtToken
+// @Param Authorization header string true "Insert your access token" default(jwt &lt;Add access token here&gt;)
+func (userHandler UserHandler) UpdateUserEmail(ctx *gin.Context) <span class="cov8" title="1">{
+        // Get authenticated user from context
+        userClaims := ctx.MustGet(constants.AuthenticatedClaimKey).(jwt.JwtCustomClaim)
+
+        ctxx := ctx.Request.Context()
+
+        var UserUpdateEmailRequest requests.UserUpdateEmailRequest
+        if err := ctx.ShouldBindJSON(&amp;UserUpdateEmailRequest); err != nil </span><span class="cov0" title="0">{
+                NewErrorResponse(ctx, http.StatusBadRequest, err.Error())
+                return
+        }</span>
+
+        <span class="cov8" title="1">claimEmail := userClaims.Email
+        oldEmail := UserUpdateEmailRequest.OldEmail
+        newEmail := UserUpdateEmailRequest.NewEmail
+
+        if _, err := util.IsOldEmailMatchClaim(oldEmail, claimEmail); err != nil </span><span class="cov0" title="0">{
+                NewErrorResponse(ctx, http.StatusBadRequest, err.Error())
+                return
+        }</span>
+
+        <span class="cov8" title="1">if err := validators.ValidatePayloads(UserUpdateEmailRequest); err != nil </span><span class="cov8" title="1">{
+                NewErrorResponse(ctx, http.StatusBadRequest, err.Error())
+                return
+        }</span>
+
+        <span class="cov8" title="1">userDom, statusCode, err := userHandler.usecase.UpdateUserEmail(ctxx, oldEmail, newEmail)
+        if err != nil </span><span class="cov8" title="1">{
+                NewErrorResponse(ctx, statusCode, err.Error())
+                return
+        }</span>
+
+        <span class="cov8" title="1">NewSuccessResponse(ctx, statusCode, "Update success", responses.FromV1Domain(userDom))</span>
+}
+
+// DeleteUser godoc
+// @Summary Delete a user
+// @Description Delete a user based on the authenticated user
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]interface{} "User data"
+// @Failure 401 {object} object{message=string,status=bool}  "Unauthorized"
+// @Failure 500 {object} object{message=string,status=bool}  "Internal Server Error"
+// @Router /v1/users/delete [delete]
+// @Security jwtToken
+// @Param Authorization header string true "Insert your access token" default(jwt &lt;Add access token here&gt;)
+func (userHandler UserHandler) DeleteUser(ctx *gin.Context) <span class="cov8" title="1">{
+        // Get authenticated user from context
+        userClaims := ctx.MustGet(constants.AuthenticatedClaimKey).(jwt.JwtCustomClaim)
+
+        ctxx := ctx.Request.Context()
+
+        _, statusCode, err := userHandler.usecase.DeleteUser(ctxx, userClaims.UserID)
+        if err != nil </span><span class="cov0" title="0">{
+                NewErrorResponse(ctx, statusCode, err.Error())
+                return
+        }</span>
+
+        <span class="cov8" title="1">NewSuccessResponse(ctx, statusCode, "user deleted", map[string]interface{}{
+                "user": userClaims.Username,
+        })</span>
+}
+
+// Login godoc
+// @Summary Login a user
+// @Description Login a user
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param user body requests.UserLoginRequest true "User data"
+// @Success 200 {object} responses.UserResponse "User data"
+// @Failure 400 {object} object{message=string,status=bool}  "Bad Request"
+// @Failure 500 {object} object{message=string,status=bool}  "Internal Server Error"
+// @Router /v1/auth/login [post]
+func (userHandler UserHandler) Login(ctx *gin.Context) <span class="cov8" title="1">{
+        var UserLoginRequest requests.UserLoginRequest
+        if err := ctx.ShouldBindJSON(&amp;UserLoginRequest); err != nil </span><span class="cov0" title="0">{
+                NewErrorResponse(ctx, http.StatusBadRequest, err.Error())
+                return
+        }</span>
+
+        <span class="cov8" title="1">if err := validators.ValidatePayloads(UserLoginRequest); err != nil </span><span class="cov8" title="1">{
+                NewErrorResponse(ctx, http.StatusBadRequest, err.Error())
+                return
+        }</span>
+
+        <span class="cov8" title="1">userDomain, statusCode, err := userHandler.usecase.Login(ctx.Request.Context(), UserLoginRequest.ToV1Domain())
+        if err != nil </span><span class="cov8" title="1">{
+                NewErrorResponse(ctx, statusCode, err.Error())
+                return
+        }</span>
+
+        <span class="cov8" title="1">NewSuccessResponse(ctx, statusCode, "login success", responses.FromV1Domain(userDomain))</span>
+}
+
+// GetSelfUser godoc
+// @Summary Get user data
+// @Description Get user data based on the authenticated user
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Success 200 {object} responses.UserResponse "User data"
+// @Failure 401 {object} object{message=string,status=bool}  "Unauthorized"
+// @Failure 500 {object} object{message=string,status=bool}  "Internal Server Error"
+// @Router /v1/users/self [get]
+// @Security jwtTokenring
+// @Param Authorization header string true "Insert your access token" default(jwt &lt;Add access token here&gt;)
+func (userHandler UserHandler) GetSelfUser(ctx *gin.Context) <span class="cov8" title="1">{
+        // get authenticated user from context
+        userClaims := ctx.MustGet(constants.AuthenticatedClaimKey).(jwt.JwtCustomClaim)
+
+        ctxx := ctx.Request.Context()
+        userDom, statusCode, err := userHandler.usecase.GetUserByID(ctxx, userClaims.UserID)
+        if err != nil </span><span class="cov8" title="1">{
+                NewErrorResponse(ctx, statusCode, err.Error())
+                return
+        }</span>
+
+        <span class="cov8" title="1">userResponse := responses.FromV1Domain(userDom)
+
+        NewSuccessResponse(ctx, statusCode, "user data fetched successfully", map[string]interface{}{
+                "user": userResponse,
+        })</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package middlewares
+
+import (
+        "fmt"
+        "strings"
+
+        "github.com/gin-gonic/gin"
+        "github.com/meisbokai/GolangApiTest/internal/constants"
+        V1Handler "github.com/meisbokai/GolangApiTest/internal/http/handlers/v1"
+        "github.com/meisbokai/GolangApiTest/pkg/jwt"
+        "github.com/meisbokai/GolangApiTest/pkg/logger"
+        "github.com/sirupsen/logrus"
+)
+
+type AuthMiddleware struct {
+        jwtService jwt.JWTService
+        isAdmin    bool
+}
+
+func NewAuthMiddleware(jwtService jwt.JWTService, isAdmin bool) gin.HandlerFunc <span class="cov8" title="1">{
+        return (&amp;AuthMiddleware{
+                jwtService: jwtService,
+                isAdmin:    isAdmin,
+        }).Handle
+}</span>
+
+func (m *AuthMiddleware) Handle(ctx *gin.Context) <span class="cov8" title="1">{
+        authHeader := ctx.GetHeader("Authorization")
+        if authHeader == "" </span><span class="cov8" title="1">{
+                V1Handler.NewAbortResponse(ctx, "missing authorization header")
+                return
+        }</span>
+
+        <span class="cov8" title="1">headerParts := strings.Split(authHeader, " ")
+        if len(headerParts) != 2 </span><span class="cov8" title="1">{
+                V1Handler.NewAbortResponse(ctx, "invalid header format")
+                return
+        }</span>
+
+        <span class="cov8" title="1">if headerParts[0] != "jwt" </span><span class="cov8" title="1">{
+                V1Handler.NewAbortResponse(ctx, "token must contain 'jtw'")
+                return
+        }</span>
+
+        <span class="cov8" title="1">claim, err := m.jwtService.ParseToken(headerParts[1])
+        if err != nil </span><span class="cov8" title="1">{
+                logger.ErrorF(fmt.Sprintf("parse token error: %s [end]", err), logrus.Fields{constants.LoggerCategory: constants.LoggerCategory})
+
+                V1Handler.NewAbortResponse(ctx, "invalid token")
+                return
+        }</span>
+
+        <span class="cov8" title="1">if claim.IsAdmin != m.isAdmin &amp;&amp; !claim.IsAdmin </span><span class="cov8" title="1">{
+                V1Handler.NewAbortResponse(ctx, "you don't have access for this action")
+                return
+        }</span>
+
+        <span class="cov8" title="1">ctx.Set(constants.AuthenticatedClaimKey, claim)
+        ctx.Next()</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package v1
+
+import (
+        "context"
+        "errors"
+        "net/http"
+        "time"
+
+        V1Domains "github.com/meisbokai/GolangApiTest/internal/http/domains/v1"
+        "github.com/meisbokai/GolangApiTest/internal/util"
+        "github.com/meisbokai/GolangApiTest/pkg/jwt"
+)
+
+type userUsecase struct {
+        repo       V1Domains.UserRepository
+        jwtService jwt.JWTService
+}
+
+func NewUserUsecase(repo V1Domains.UserRepository, jwtService jwt.JWTService) V1Domains.UserUsecase <span class="cov8" title="1">{
+        return &amp;userUsecase{
+                repo:       repo,
+                jwtService: jwtService,
+        }
+}</span>
+
+func (userUC *userUsecase) GetAllUsers(ctx context.Context) (outDom []V1Domains.UserDomain, statusCode int, err error) <span class="cov8" title="1">{
+        users, err := userUC.repo.GetAllUsers(ctx)
+        if err != nil </span><span class="cov0" title="0">{
+                return []V1Domains.UserDomain{}, http.StatusNotFound, errors.New("Unable to get full list of users")
+        }</span>
+
+        <span class="cov8" title="1">return users, http.StatusOK, nil</span>
+}
+
+func (userUC *userUsecase) CreateUser(ctx context.Context, inDom *V1Domains.UserDomain) (outDom V1Domains.UserDomain, statusCode int, err error) <span class="cov8" title="1">{
+        inDom.Password, err = util.GenerateHash(inDom.Password)
+        if err != nil </span><span class="cov8" title="1">{
+                return V1Domains.UserDomain{}, http.StatusInternalServerError, err
+        }</span>
+
+        <span class="cov8" title="1">inDom.CreatedAt = time.Now().In(time.FixedZone("GMT+8", 8*60*60))
+
+        err = userUC.repo.CreateUser(ctx, inDom)
+        if err != nil </span><span class="cov8" title="1">{
+                return V1Domains.UserDomain{}, http.StatusInternalServerError, err
+        }</span>
+
+        <span class="cov8" title="1">outDom, err = userUC.repo.GetUserByEmail(ctx, inDom)
+        if err != nil </span><span class="cov0" title="0">{
+                return V1Domains.UserDomain{}, http.StatusInternalServerError, err
+        }</span>
+
+        <span class="cov8" title="1">return outDom, http.StatusCreated, nil</span>
+}
+
+func (userUC *userUsecase) GetUserByEmail(ctx context.Context, email string) (outDom V1Domains.UserDomain, statusCode int, err error) <span class="cov8" title="1">{
+        user, err := userUC.repo.GetUserByEmail(ctx, &amp;V1Domains.UserDomain{Email: email})
+        if err != nil </span><span class="cov8" title="1">{
+                return V1Domains.UserDomain{}, http.StatusNotFound, errors.New("email not found")
+        }</span>
+
+        <span class="cov8" title="1">return user, http.StatusOK, nil</span>
+}
+
+func (userUC *userUsecase) UpdateUserEmail(ctx context.Context, oldEmail string, newEmail string) (outDom V1Domains.UserDomain, statusCode int, err error) <span class="cov8" title="1">{
+        user, err := userUC.repo.GetUserByEmail(ctx, &amp;V1Domains.UserDomain{Email: oldEmail})
+        if err != nil </span><span class="cov0" title="0">{
+                return V1Domains.UserDomain{}, http.StatusNotFound, errors.New("email not found")
+        }</span>
+
+        // Check if new email is valid
+        <span class="cov8" title="1">_, err = util.ValidateEmail(newEmail)
+        if err != nil </span><span class="cov0" title="0">{
+                return V1Domains.UserDomain{}, http.StatusBadRequest, err
+        }</span>
+
+        // Check if new email is same as old
+        <span class="cov8" title="1">_, err = util.IsOldEmailMatchNew(user.Email, newEmail)
+        if err != nil </span><span class="cov0" title="0">{
+                return V1Domains.UserDomain{}, http.StatusBadRequest, err
+        }</span>
+
+        <span class="cov8" title="1">err = userUC.repo.UpdateUserEmail(ctx, &amp;V1Domains.UserDomain{Email: oldEmail}, newEmail)
+        if err != nil </span><span class="cov0" title="0">{
+                return V1Domains.UserDomain{}, http.StatusInternalServerError, err
+        }</span>
+
+        <span class="cov8" title="1">user, err = userUC.repo.GetUserByEmail(ctx, &amp;V1Domains.UserDomain{Email: newEmail})
+        if err != nil </span><span class="cov0" title="0">{
+                return V1Domains.UserDomain{}, http.StatusNotFound, errors.New("New email not found")
+        }</span>
+
+        <span class="cov8" title="1">return user, http.StatusOK, nil</span>
+}
+
+func (userUC *userUsecase) DeleteUser(ctx context.Context, id string) (outDom V1Domains.UserDomain, statusCode int, err error) <span class="cov8" title="1">{
+        user, err := userUC.repo.GetUserByID(ctx, &amp;V1Domains.UserDomain{ID: id})
+
+        err = userUC.repo.DeleteUser(ctx, &amp;V1Domains.UserDomain{ID: id})
+        if err != nil </span><span class="cov0" title="0">{
+                return V1Domains.UserDomain{}, http.StatusInternalServerError, err
+        }</span>
+
+        <span class="cov8" title="1">return user, http.StatusOK, nil</span>
+}
+
+func (userUC *userUsecase) Login(ctx context.Context, inDom *V1Domains.UserDomain) (outDom V1Domains.UserDomain, statusCode int, err error) <span class="cov8" title="1">{
+        userDomain, err := userUC.repo.GetUserByEmail(ctx, inDom)
+        if err != nil </span><span class="cov0" title="0">{
+                return V1Domains.UserDomain{}, http.StatusUnauthorized, errors.New("invalid email or password") // for security purpose better use generic error message
+        }</span>
+
+        <span class="cov8" title="1">if !util.ValidateHash(inDom.Password, userDomain.Password) </span><span class="cov8" title="1">{
+                return V1Domains.UserDomain{}, http.StatusUnauthorized, errors.New("invalid email or password(hash)")
+        }</span>
+
+        // RodeID 1 = Admin
+        <span class="cov8" title="1">if userDomain.RoleID == 1 </span><span class="cov8" title="1">{
+                userDomain.Token, err = userUC.jwtService.GenerateToken(userDomain.ID, userDomain.Username, true, userDomain.Email, userDomain.Password)
+        }</span> else<span class="cov8" title="1"> {
+                userDomain.Token, err = userUC.jwtService.GenerateToken(userDomain.ID, userDomain.Username, false, userDomain.Email, userDomain.Password)
+        }</span>
+
+        <span class="cov8" title="1">if err != nil </span><span class="cov0" title="0">{
+                return V1Domains.UserDomain{}, http.StatusInternalServerError, err
+        }</span>
+
+        <span class="cov8" title="1">return userDomain, http.StatusOK, nil</span>
+}
+
+func (userUC *userUsecase) GetUserByID(ctx context.Context, id string) (outDom V1Domains.UserDomain, statusCode int, err error) <span class="cov8" title="1">{
+        user, err := userUC.repo.GetUserByID(ctx, &amp;V1Domains.UserDomain{ID: id})
+        if err != nil </span><span class="cov8" title="1">{
+                return V1Domains.UserDomain{}, http.StatusNotFound, errors.New("id not found")
+        }</span>
+
+        <span class="cov8" title="1">return user, http.StatusOK, nil</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
