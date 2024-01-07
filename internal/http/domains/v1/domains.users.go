@@ -6,14 +6,14 @@ import (
 )
 
 type UserDomain struct {
-	ID        string
-	RoleID    int
-	Username  string
-	Email     string
-	Password  string
-	CreatedAt time.Time
-	UpdatedAt *time.Time
-	Token     string
+	ID        string     `json:"id"`
+	RoleID    int        `'json:"role_id"`
+	Username  string     `json:"username"`
+	Email     string     `json:"email"`
+	Password  string     `json:"-"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt *time.Time `json:"updated_at"`
+	Token     string     `json:"token"`
 }
 
 type UserUsecase interface {

@@ -3,9 +3,9 @@ package requests
 import V1Domains "github.com/meisbokai/GolangApiTest/internal/http/domains/v1"
 
 type UserCreateRequest struct {
-	Username string
-	Email    string
-	Password string
+	Username string `json:"username" validate:"required,min=4" example:"New User 1"`
+	Email    string `json:"email" validate:"required,email" example:"newuser1@example.com"`
+	Password string `json:"password" validate:"required,min=4" example:"12345"`
 }
 
 // Mapping Create Request to Domain User
@@ -19,13 +19,13 @@ func (user UserCreateRequest) ToV1Domain() *V1Domains.UserDomain {
 }
 
 type UserUpdateEmailRequest struct {
-	NewEmail string
-	OldEmail string
+	NewEmail string `json:"newEmail" validate:"required,email" example:"test1changed@example.com"`
+	OldEmail string `json:"oldEmail" validate:"required,email" example:"test1@example.com"`
 }
 
 type UserLoginRequest struct {
-	Email    string
-	Password string
+	Email    string `json:"email" validate:"required,email" example:"test1@example.com"`
+	Password string `json:"password" validate:"required,min=4" example:"12345"`
 }
 
 // Mapping Login Request to Domain User

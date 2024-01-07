@@ -11,6 +11,7 @@ import (
 	"github.com/meisbokai/GolangApiTest/internal/http/responses"
 	"github.com/meisbokai/GolangApiTest/internal/util"
 	"github.com/meisbokai/GolangApiTest/pkg/jwt"
+	"github.com/meisbokai/GolangApiTest/pkg/validators"
 )
 
 type UserHandler struct {
@@ -41,6 +42,11 @@ func (userHandler UserHandler) GetAllUserData(ctx *gin.Context) {
 func (userHandler UserHandler) CreateUser(ctx *gin.Context) {
 	var userCreateRequest requests.UserCreateRequest
 	if err := ctx.ShouldBindJSON(&userCreateRequest); err != nil {
+		NewErrorResponse(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err := validators.ValidatePayloads(userCreateRequest); err != nil {
 		NewErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -98,6 +104,11 @@ func (userHandler UserHandler) UpdateUserEmail(ctx *gin.Context) {
 		return
 	}
 
+	if err := validators.ValidatePayloads(UserUpdateEmailRequest); err != nil {
+		NewErrorResponse(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
 	userDom, statusCode, err := userHandler.usecase.UpdateUserEmail(ctxx, oldEmail, newEmail)
 	if err != nil {
 		NewErrorResponse(ctx, statusCode, err.Error())
@@ -129,6 +140,11 @@ func (userHandler UserHandler) DeleteUser(ctx *gin.Context) {
 func (userHandler UserHandler) Login(ctx *gin.Context) {
 	var UserLoginRequest requests.UserLoginRequest
 	if err := ctx.ShouldBindJSON(&UserLoginRequest); err != nil {
+		NewErrorResponse(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err := validators.ValidatePayloads(UserLoginRequest); err != nil {
 		NewErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}

@@ -7,14 +7,14 @@ import (
 )
 
 type UserResponse struct {
-	Id        string
-	Username  string
-	Email     string
-	Password  string
-	RoleId    int
-	Token     string
-	CreatedAt time.Time
-	UpdatedAt *time.Time
+	Id        string     `json:"id" example:"1a2b3c"`
+	Username  string     `json:"username" example:"John Doe"`
+	Email     string     `json:"email" example:"johndoe@example.com"`
+	Password  string     `json:"password,omitempty"`
+	RoleId    int        `json:"role_id" example:"2"`
+	Token     string     `json:"token,omitempty"`
+	CreatedAt time.Time  `json:"created_at" example:"2023-12-21 18:58:07.230517+00"`
+	UpdatedAt *time.Time `json:"updated_at" example:"2023-12-21 19:20:07.230517+00"`
 }
 
 func (u *UserResponse) ToV1Domain() V1Domains.UserDomain {
