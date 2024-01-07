@@ -4,14 +4,15 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	config "github.com/meisbokai/GolangApiTest/internal/configs"
 	"github.com/meisbokai/GolangApiTest/internal/datasources/drivers"
 )
 
 func SetupPostgresConnection() (*sqlx.DB, error) {
 	// Setup sqlx config of postgreSQL
 	config := drivers.SQLXConfig{
-		DriverName:     "postgres",
-		DataSourceName: "user=postgres password=golangapitest host=localhost port=5432 dbname=postgres sslmode=disable timezone=Asia/Singapore",
+		DriverName:     config.AppConfig.DBPostgreDriver,
+		DataSourceName: config.AppConfig.DBPostgreDsn,
 		MaxOpenConns:   100,
 		MaxIdleConns:   10,
 		MaxLifetime:    15 * time.Minute,
