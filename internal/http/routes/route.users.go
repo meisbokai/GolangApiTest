@@ -26,10 +26,15 @@ func (r *usersRoutes) Routes() {
 	// Routes V1
 	V1Route := r.router.Group("/v1")
 	{
-		V1Route.GET("/all", r.V1Handler.GetAllUserData)
-		V1Route.POST("/signup", r.V1Handler.CreateUser)
-		V1Route.GET("/email", r.V1Handler.GetUserByEmail)
-		V1Route.PUT("/updateEmail", r.V1Handler.UpdateUserEmail)
+		// Authentications routes
+		V1AuhtRoute := V1Route.Group("/auth")
+		V1AuhtRoute.POST("/signup", r.V1Handler.CreateUser)
+
+		// Users
+		V1UserRoute := V1Route.Group("/users")
+		V1UserRoute.GET("/all", r.V1Handler.GetAllUserData)
+		V1UserRoute.GET("/email", r.V1Handler.GetUserByEmail)
+		V1UserRoute.PUT("/updateEmail", r.V1Handler.UpdateUserEmail)
 
 	}
 
