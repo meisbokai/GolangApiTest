@@ -31,14 +31,15 @@ func (r *usersRoutes) Routes() {
 		// Authentications routes
 		V1AuhtRoute := V1Route.Group("/auth")
 		V1AuhtRoute.POST("/signup", r.V1Handler.CreateUser)
+		V1AuhtRoute.POST("/login", r.V1Handler.Login)
 
 		// Users
 		V1UserRoute := V1Route.Group("/users")
 		V1UserRoute.Use(r.authMiddleware)
 		{
-		V1UserRoute.GET("/self", r.V1Handler.GetUserByEmail) // TODO: Find a way to identify the sender without param/body
-		V1UserRoute.PUT("/updateEmail", r.V1Handler.UpdateUserEmail)
-		V1UserRoute.DELETE("/delete", r.V1Handler.DeleteUser)
+			V1UserRoute.GET("/self", r.V1Handler.GetUserByEmail) // TODO: Find a way to identify the sender without param/body
+			V1UserRoute.PUT("/updateEmail", r.V1Handler.UpdateUserEmail)
+			V1UserRoute.DELETE("/delete", r.V1Handler.DeleteUser)
 		}
 
 	}

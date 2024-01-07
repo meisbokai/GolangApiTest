@@ -19,6 +19,19 @@ func (user UserCreateRequest) ToV1Domain() *V1Domains.UserDomain {
 }
 
 type UserUpdateEmailRequest struct {
-	NewEmail string `json:"newEmail" validate:"required,email" example:"test1changed@example.com"`
-	OldEmail string `json:"oldEmail" validate:"required,email" example:"test1@example.com"`
+	NewEmail string
+	OldEmail string
+}
+
+type UserLoginRequest struct {
+	Email    string
+	Password string
+}
+
+// Mapping Login Request to Domain User
+func (u *UserLoginRequest) ToV1Domain() *V1Domains.UserDomain {
+	return &V1Domains.UserDomain{
+		Email:    u.Email,
+		Password: u.Password,
+	}
 }

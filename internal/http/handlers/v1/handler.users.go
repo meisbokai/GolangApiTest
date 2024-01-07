@@ -114,3 +114,19 @@ func (userHandler UserHandler) DeleteUser(ctx *gin.Context) {
 	})
 
 }
+
+func (userHandler UserHandler) Login(ctx *gin.Context) {
+	var UserLoginRequest requests.UserLoginRequest
+	if err := ctx.ShouldBindJSON(&UserLoginRequest); err != nil {
+		NewErrorResponse(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	userDomain, statusCode, err := userHandler.usecase.Login(ctx.Request.Context(), UserLoginRequest.ToV1Domain())
+	if err != nil {
+		NewErrorResponse(ctx, statusCode, err.Error())
+		return
+	}
+
+	NewSuccessResponse(ctx, statusCode, "login success", responses.FromV1Domain(userDomain))
+}

@@ -103,3 +103,27 @@ func (userUC *userUsecase) DeleteUser(ctx context.Context, email string) (outDom
 
 	return user, http.StatusOK, nil
 }
+
+func (userUC *userUsecase) Login(ctx context.Context, inDom *V1Domains.UserDomain) (outDom V1Domains.UserDomain, statusCode int, err error) {
+	userDomain, err := userUC.repo.GetUserByEmail(ctx, inDom)
+	if err != nil {
+		return V1Domains.UserDomain{}, http.StatusUnauthorized, errors.New("invalid email or password") // for security purpose better use generic error message
+	}
+
+	if !util.ValidateHash(inDom.Password, userDomain.Password) {
+		return V1Domains.UserDomain{}, http.StatusUnauthorized, errors.New("invalid email or password(hash)")
+	}
+
+	// RodeID 1 = Admin
+	if userDomain.RoleID == 1 {
+		userDomain.Token, err = userUC.jwtService.GenerateToken(userDomain.ID, userDomain.Username, true, userDomain.Email, userDomain.Password)
+	} else {
+		userDomain.Token, err = userUC.jwtService.GenerateToken(userDomain.ID, userDomain.Username, false, userDomain.Email, userDomain.Password)
+	}
+
+	if err != nil {
+		return V1Domains.UserDomain{}, http.StatusInternalServerError, err
+	}
+
+	return userDomain, http.StatusOK, nil
+}
