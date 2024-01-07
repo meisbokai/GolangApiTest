@@ -24,6 +24,18 @@ func NewUserHandler(usecase V1Domains.UserUsecase) UserHandler {
 	}
 }
 
+// GetAllUserData godoc
+// @Summary Get all user data
+// @Description Get all user data
+// @Tags Admin
+// @Accept json
+// @Produce json
+// @Success 200 {array} responses.UserResponse "User data"
+// @Failure 401 {object} object{message=string,status=bool} "Unauthorized"
+// @Failure 500 {object} object{message=string,status=bool} "Internal Server Error"
+// @Router /v1/admin/users/all [get]
+// @Security jwtToken
+// @Param Authorization header string true "Insert your access token" default(jwt <Add access token here>)
 func (userHandler UserHandler) GetAllUserData(ctx *gin.Context) {
 	ctxx := ctx.Request.Context()
 	userDom, statusCode, err := userHandler.usecase.GetAllUsers(ctxx)
@@ -39,6 +51,17 @@ func (userHandler UserHandler) GetAllUserData(ctx *gin.Context) {
 	})
 }
 
+// CreateUser godoc
+// @Summary Create a user
+// @Description Create a new user
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param user body requests.UserCreateRequest true "User data"
+// @Success 201 {object} responses.UserResponse "User data"
+// @Failure 400 {object} object{message=string,status=bool}  "Bad Request"
+// @Failure 500 {object} object{message=string,status=bool}  "Internal Server Error"
+// @Router /v1/auth/signup [post]
 func (userHandler UserHandler) CreateUser(ctx *gin.Context) {
 	var userCreateRequest requests.UserCreateRequest
 	if err := ctx.ShouldBindJSON(&userCreateRequest); err != nil {
@@ -64,6 +87,19 @@ func (userHandler UserHandler) CreateUser(ctx *gin.Context) {
 	})
 }
 
+// GetUserByEmail godoc
+// @Summary Get user by email
+// @Description Get user by email
+// @Tags Admin
+// @Accept json
+// @Produce json
+// @Param email query string true "email"
+// @Success 200 {object} responses.UserResponse "User data"
+// @Failure 404 {object} object{message=string,status=bool}  "Not Found"
+// @Failure 500 {object} object{message=string,status=bool}  "Internal Server Error"
+// @Router /v1/admin/users/email [get]
+// @Security jwtToken
+// @Param Authorization header string true "Insert your access token" default(jwt <Add access token here>)
 func (userHandler UserHandler) GetUserByEmail(ctx *gin.Context) {
 	ctxx := ctx.Request.Context()
 
@@ -80,9 +116,22 @@ func (userHandler UserHandler) GetUserByEmail(ctx *gin.Context) {
 	NewSuccessResponse(ctx, statusCode, "user data fetched successfully", map[string]interface{}{
 		"user": userResponse,
 	})
-
 }
 
+// UpdateUserEmail godoc
+// @Summary Update user email
+// @Description Update user email based on the authenticated user
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param body body requests.UserUpdateEmailRequest true "Update email request"
+// @Success 200 {object} responses.UserResponse "User data"
+// @Failure 400 {object} object{message=string,status=bool}  "Bad Request"
+// @Failure 401 {object} object{message=string,status=bool}  "Unauthorized"
+// @Failure 500 {object} object{message=string,status=bool}  "Internal Server Error"
+// @Router /v1/users/updateEmail [put]
+// @Security jwtToken
+// @Param Authorization header string true "Insert your access token" default(jwt <Add access token here>)
 func (userHandler UserHandler) UpdateUserEmail(ctx *gin.Context) {
 	// Get authenticated user from context
 	userClaims := ctx.MustGet(constants.AuthenticatedClaimKey).(jwt.JwtCustomClaim)
@@ -116,9 +165,20 @@ func (userHandler UserHandler) UpdateUserEmail(ctx *gin.Context) {
 	}
 
 	NewSuccessResponse(ctx, statusCode, "Update success", responses.FromV1Domain(userDom))
-
 }
 
+// DeleteUser godoc
+// @Summary Delete a user
+// @Description Delete a user based on the authenticated user
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]interface{} "User data"
+// @Failure 401 {object} object{message=string,status=bool}  "Unauthorized"
+// @Failure 500 {object} object{message=string,status=bool}  "Internal Server Error"
+// @Router /v1/users/delete [delete]
+// @Security jwtToken
+// @Param Authorization header string true "Insert your access token" default(jwt <Add access token here>)
 func (userHandler UserHandler) DeleteUser(ctx *gin.Context) {
 	// Get authenticated user from context
 	userClaims := ctx.MustGet(constants.AuthenticatedClaimKey).(jwt.JwtCustomClaim)
@@ -134,9 +194,19 @@ func (userHandler UserHandler) DeleteUser(ctx *gin.Context) {
 	NewSuccessResponse(ctx, statusCode, "user deleted", map[string]interface{}{
 		"user": userClaims.Username,
 	})
-
 }
 
+// Login godoc
+// @Summary Login a user
+// @Description Login a user
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param user body requests.UserLoginRequest true "User data"
+// @Success 200 {object} responses.UserResponse "User data"
+// @Failure 400 {object} object{message=string,status=bool}  "Bad Request"
+// @Failure 500 {object} object{message=string,status=bool}  "Internal Server Error"
+// @Router /v1/auth/login [post]
 func (userHandler UserHandler) Login(ctx *gin.Context) {
 	var UserLoginRequest requests.UserLoginRequest
 	if err := ctx.ShouldBindJSON(&UserLoginRequest); err != nil {
@@ -158,6 +228,18 @@ func (userHandler UserHandler) Login(ctx *gin.Context) {
 	NewSuccessResponse(ctx, statusCode, "login success", responses.FromV1Domain(userDomain))
 }
 
+// GetSelfUser godoc
+// @Summary Get user data
+// @Description Get user data based on the authenticated user
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Success 200 {object} responses.UserResponse "User data"
+// @Failure 401 {object} object{message=string,status=bool}  "Unauthorized"
+// @Failure 500 {object} object{message=string,status=bool}  "Internal Server Error"
+// @Router /v1/users/self [get]
+// @Security jwtTokenring
+// @Param Authorization header string true "Insert your access token" default(jwt <Add access token here>)
 func (userHandler UserHandler) GetSelfUser(ctx *gin.Context) {
 	// get authenticated user from context
 	userClaims := ctx.MustGet(constants.AuthenticatedClaimKey).(jwt.JwtCustomClaim)
@@ -174,5 +256,4 @@ func (userHandler UserHandler) GetSelfUser(ctx *gin.Context) {
 	NewSuccessResponse(ctx, statusCode, "user data fetched successfully", map[string]interface{}{
 		"user": userResponse,
 	})
-
 }

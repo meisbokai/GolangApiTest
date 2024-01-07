@@ -19,6 +19,8 @@ import (
 	"github.com/meisbokai/GolangApiTest/pkg/jwt"
 	"github.com/meisbokai/GolangApiTest/pkg/logger"
 	"github.com/sirupsen/logrus"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type App struct {
@@ -48,6 +50,8 @@ func NewServerApp() (*App, error) {
 	// API Routes
 	api := router.Group("api")
 	api.GET("/", routes.RootHandler)
+	api.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	routes.NewUsersRoute(api, conn, jwtService, authMiddleware).Routes()
 	routes.NewAdminRoute(api, conn, jwtService, adminAuthMiddleware).Routes()
 

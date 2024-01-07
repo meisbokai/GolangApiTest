@@ -6,6 +6,8 @@ import (
 	V1Domains "github.com/meisbokai/GolangApiTest/internal/http/domains/v1"
 )
 
+// User information
+// @Description Response to a user request containing user information
 type UserResponse struct {
 	Id        string     `json:"id" example:"1a2b3c"`
 	Username  string     `json:"username" example:"John Doe"`
@@ -15,7 +17,7 @@ type UserResponse struct {
 	Token     string     `json:"token,omitempty"`
 	CreatedAt time.Time  `json:"created_at" example:"2023-12-21 18:58:07.230517+00"`
 	UpdatedAt *time.Time `json:"updated_at" example:"2023-12-21 19:20:07.230517+00"`
-}
+} // @name UserResponse
 
 func (u *UserResponse) ToV1Domain() V1Domains.UserDomain {
 	return V1Domains.UserDomain{
