@@ -38,6 +38,7 @@ func NewServerApp() (*App, error) {
 	api := router.Group("api")
 	api.GET("/", routes.RootHandler)
 	routes.NewUsersRoute(api, conn).Routes()
+	routes.NewAdminRoute(api, conn).Routes()
 
 	// http Server
 	server := &http.Server{
