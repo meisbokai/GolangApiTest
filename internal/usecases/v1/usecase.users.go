@@ -58,3 +58,34 @@ func (userUC *userUsecase) GetUserByEmail(ctx context.Context, email string) (ou
 
 	return user, http.StatusOK, nil
 }
+
+func (userUC *userUsecase) UpdateUserEmail(ctx context.Context, oldEmail string, newEmail string) (outDom V1Domains.UserDomain, statusCode int, err error) {
+	user, err := userUC.repo.GetUserByEmail(ctx, &V1Domains.UserDomain{Email: oldEmail})
+	if err != nil {
+		return V1Domains.UserDomain{}, http.StatusNotFound, errors.New("email not found")
+	}
+
+	// Check if new email is valid
+	_, err = util.ValidateEmail(newEmail)
+	if err != nil {
+		return V1Domains.UserDomain{}, http.StatusBadRequest, err
+	}
+
+	// Check if new email is same as old
+	_, err = util.IsOldEmailMatch(user.Email, newEmail)
+	if err != nil {
+		return V1Domains.UserDomain{}, http.StatusBadRequest, err
+	}
+
+	err = userUC.repo.UpdateUserEmail(ctx, &V1Domains.UserDomain{Email: oldEmail}, newEmail)
+	if err != nil {
+		return V1Domains.UserDomain{}, http.StatusInternalServerError, err
+	}
+
+	user, err = userUC.repo.GetUserByEmail(ctx, &V1Domains.UserDomain{Email: newEmail})
+	if err != nil {
+		return V1Domains.UserDomain{}, http.StatusNotFound, errors.New("New email not found")
+	}
+
+	return user, http.StatusOK, nil
+}

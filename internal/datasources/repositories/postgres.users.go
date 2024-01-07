@@ -53,3 +53,15 @@ func (r *postgreUserRepository) GetUserByEmail(ctx context.Context, inDom *V1Dom
 
 	return userRecord.ToV1Domain(), nil
 }
+
+func (r *postgreUserRepository) UpdateUserEmail(ctx context.Context, inDom *V1Domains.UserDomain, newEmail string) (err error) {
+
+	userRecord := records.FromUsersV1Domain(inDom)
+	params := map[string]interface{}{"oldEmail": userRecord.Email, "newEmail": newEmail}
+
+	_, err = r.conn.NamedQueryContext(ctx, `UPDATE users SET email = :newEmail WHERE "email" = :oldEmail`, params)
+	if err != nil {
+		return err
+	}
+	return nil
+}

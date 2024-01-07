@@ -17,3 +17,8 @@ func (user UserCreateRequest) ToV1Domain() *V1Domains.UserDomain {
 		RoleID:   2,
 	}
 }
+
+type UserUpdateEmailRequest struct {
+	NewEmail string `json:"newEmail" validate:"required,email" example:"test1changed@example.com"`
+	OldEmail string `json:"oldEmail" validate:"required,email" example:"test1@example.com"`
+}

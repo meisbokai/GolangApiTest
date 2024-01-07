@@ -73,3 +73,25 @@ func (userHandler UserHandler) GetUserByEmail(ctx *gin.Context) {
 	})
 
 }
+
+func (userHandler UserHandler) UpdateUserEmail(ctx *gin.Context) {
+	ctxx := ctx.Request.Context()
+
+	var UserUpdateEmailRequest requests.UserUpdateEmailRequest
+	if err := ctx.ShouldBindJSON(&UserUpdateEmailRequest); err != nil {
+		NewErrorResponse(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	oldEmail := UserUpdateEmailRequest.OldEmail
+	newEmail := UserUpdateEmailRequest.NewEmail
+
+	userDom, statusCode, err := userHandler.usecase.UpdateUserEmail(ctxx, oldEmail, newEmail)
+	if err != nil {
+		NewErrorResponse(ctx, statusCode, err.Error())
+		return
+	}
+
+	NewSuccessResponse(ctx, statusCode, "Update success", responses.FromV1Domain(userDom))
+
+}
