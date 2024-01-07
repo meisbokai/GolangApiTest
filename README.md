@@ -1,26 +1,77 @@
-# Overview
+# GolangApiTest
 
-Develop a simple RESTful API service using Golang, which interfaces with a database of your choice (e.g., PostgreSQL, MySQL, MongoDB). The service will manage a basic user system and support operations like creating new users, fetching user details, updating user data, and deleting users.  
+GolangApiTestis an API server that interacts with a Postgresql database to manage a database of Users
 
-# Requirements 
+## Installation
+Clone this repo into your desired directory
 
-  1. API Implementation: Create endpoints for user management: Create, Read, Update, and Delete (CRUD). Implement input validation and proper HTTP response codes. 
-  2. Database Interaction: Design a database schema to store user information (e.g., ID, username, email, created_at). Integrate the database with the Golang application. Demonstrate CRUD operations on the user data. 
-  3. Learning Ability Assessment: Implement one advanced feature, such as JWT-based authentication, OAuth integration, or a caching mechanism. Document your learning process and challenges encountered while implementing this feature. 
-  4. Testing: Write unit tests for the API endpoints. Include instructions for setting up and running the tests. 
-  5. Documentation: Provide a README file with clear instructions on how to set up and run the application. Document the API endpoints with examples (you can use tools like Swagger or Postman). 
-  6. Code Quality: Ensure the code is well-organized, properly commented, and follows best practices. 
-  7. Bonus (Optional): Containerize the application using Docker. Implement additional features like pagination, sorting, or advanced search for users. 
+```bash
+git clone https://github.com/meisbokai/GolangApiTest
+```
 
-# Submission Guidelines 
+## Usage
+Execution of this repository assumes that the device running it has the following:
+ - Go (Implemented on v1.21.5)
+ - Postgres SQL 
 
-The code should be submitted via a Git repository (e.g., GitHub, GitLab). Ensure the repository is well-organized and includes a meaningful commit history to show the development process. 
+### Dependency Installation
+```bash
+go get -d ./...
+```
 
-# Evaluation Criteria 
+### Setting up the database
+We will need to create the table that will store the user data
+```bash
+make mig-up
+```
+For the sake of testing, `user`s can be seeded into the database
+```bash
+make seed
+```
 
-- Functionality: The application works as expected and fulfills all requirements. 
-- Code Quality: Clean, readable, and well-structured code. 
-- Database Integration: Effective and efficient data handling. 
-- Test Coverage: Comprehensive tests for all functionalities. 
-- Documentation: Clear and concise documentation, including the learning process. 
-- Bonus Points: Implementation of advanced features and containerization.
+### Running the server
+Use the following command to run the server
+```bash
+make serve
+```
+
+### End point documentation
+
+API documentation is available on swagger in the following url:
+http://localhost:3000/api/v1/swagger/index.html
+
+Note: url is only active when the server is running
+
+For ease of usage, the jwt token found below will grant admin access to all the endpoints. It can also be obtained using the login endpoint with the credentials found below.
+
+* Admin Credentials
+    ```json
+    {
+    "email": "test1@example.com",
+    "password": "12345"
+    }
+    ```
+* Login Result
+    ```json
+    {
+        "id": "6946bc07-558b-47e7-bb47-f80e50e15e3c",
+        "username": "test user 1",
+        "email": "test1@example.com",
+        "password": "$2a$10$aQ2YHu20mmm.K7vi2qB.RufPG0i8VVlaBcnatoIYxlDUZPlBauhRG",
+        "role_id": 1,
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiI2OTQ2YmMwNy01NThiLTQ3ZTctYmI0Ny1mODBlNTBlMTVlM2MiLCJVc2VybmFtZSI6InRlc3QgdXNlciAxIiwiSXNBZG1pbiI6dHJ1ZSwiRW1haWwiOiJ0ZXN0MUBleGFtcGxlLmNvbSIsIlBhc3N3b3JkIjoiJDJhJDEwJGFRMllIdTIwbW1tLks3dmkycUIuUnVmUEcwaThWVmxhQmNuYXRvSVl4bERVWlBsQmF1aFJHIiwiaXNzIjoibWVpc2Jva2FpIiwiZXhwIjoxNzA0NjUyNjE4LCJpYXQiOjE3MDQ2MzQ2MTh9.NTSuDp3vz22QFEB_bueFS5gARhG6xlrgJtKzAFanB2Y",
+        "created_at": "2024-01-07T21:36:45.054134+08:00",
+        "updated_at": null
+    }
+    ```
+
+To use the jwt token, append the token string to `jwt <token>` and insert it to an `Authorization` header. Examples can be found in the swagger endpoint documentation. 
+
+
+## Testing
+A coverage test can be conducted using the following command
+```
+make coverage
+```
+
+

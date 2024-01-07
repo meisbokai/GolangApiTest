@@ -1,0 +1,410 @@
+basePath: /api
+definitions:
+  UserCreateRequest:
+    description: Request to create new user using username, email and password
+    properties:
+      email:
+        example: newuser1@example.com
+        type: string
+      password:
+        example: "12345"
+        minLength: 4
+        type: string
+      username:
+        example: New User 1
+        minLength: 4
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
+  UserLoginRequest:
+    description: Request to login to existing user using email and password
+    properties:
+      email:
+        example: test1@example.com
+        type: string
+      password:
+        example: "12345"
+        minLength: 4
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  UserResponse:
+    description: Response to a user request containing user information
+    properties:
+      created_at:
+        example: 2023-12-21 18:58:07.230517+00
+        type: string
+      email:
+        example: johndoe@example.com
+        type: string
+      id:
+        example: 1a2b3c
+        type: string
+      password:
+        type: string
+      role_id:
+        example: 2
+        type: integer
+      token:
+        type: string
+      updated_at:
+        example: 2023-12-21 19:20:07.230517+00
+        type: string
+      username:
+        example: John Doe
+        type: string
+    type: object
+  UserUpdateEmailRequest:
+    description: Request to change password of an existing user
+    properties:
+      newEmail:
+        example: test1changed@example.com
+        type: string
+      oldEmail:
+        example: test1@example.com
+        type: string
+    required:
+    - newEmail
+    - oldEmail
+    type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+host: localhost:3000
+info:
+  contact:
+    email: neow.bokai@gmail.com
+    name: Neow Bo Kai
+    url: www.github.com/meisbokai
+  description: This is a mock server for an assignment
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: User API Server Test
+  version: "1.0"
+paths:
+  /v1/admin/users/all:
+    get:
+      consumes:
+      - application/json
+      description: Get all user data
+      parameters:
+      - default: jwt <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User data
+          schema:
+            items:
+              $ref: '#/definitions/UserResponse'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            properties:
+              message:
+                type: string
+              status:
+                type: boolean
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            properties:
+              message:
+                type: string
+              status:
+                type: boolean
+            type: object
+      security:
+      - jwtToken: []
+      summary: Get all user data
+      tags:
+      - Admin
+  /v1/admin/users/email:
+    get:
+      consumes:
+      - application/json
+      description: Get user by email
+      parameters:
+      - description: email
+        in: query
+        name: email
+        required: true
+        type: string
+      - default: jwt <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User data
+          schema:
+            $ref: '#/definitions/UserResponse'
+        "404":
+          description: Not Found
+          schema:
+            properties:
+              message:
+                type: string
+              status:
+                type: boolean
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            properties:
+              message:
+                type: string
+              status:
+                type: boolean
+            type: object
+      security:
+      - jwtToken: []
+      summary: Get user by email
+      tags:
+      - Admin
+  /v1/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login a user
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/UserLoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User data
+          schema:
+            $ref: '#/definitions/UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            properties:
+              message:
+                type: string
+              status:
+                type: boolean
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            properties:
+              message:
+                type: string
+              status:
+                type: boolean
+            type: object
+      summary: Login a user
+      tags:
+      - Auth
+  /v1/auth/signup:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/UserCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User data
+          schema:
+            $ref: '#/definitions/UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            properties:
+              message:
+                type: string
+              status:
+                type: boolean
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            properties:
+              message:
+                type: string
+              status:
+                type: boolean
+            type: object
+      summary: Create a user
+      tags:
+      - Auth
+  /v1/users/delete:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a user based on the authenticated user
+      parameters:
+      - default: jwt <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User data
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            properties:
+              message:
+                type: string
+              status:
+                type: boolean
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            properties:
+              message:
+                type: string
+              status:
+                type: boolean
+            type: object
+      security:
+      - jwtToken: []
+      summary: Delete a user
+      tags:
+      - Users
+  /v1/users/self:
+    get:
+      consumes:
+      - application/json
+      description: Get user data based on the authenticated user
+      parameters:
+      - default: jwt <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User data
+          schema:
+            $ref: '#/definitions/UserResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            properties:
+              message:
+                type: string
+              status:
+                type: boolean
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            properties:
+              message:
+                type: string
+              status:
+                type: boolean
+            type: object
+      security:
+      - jwtTokenring: []
+      summary: Get user data
+      tags:
+      - Users
+  /v1/users/updateEmail:
+    put:
+      consumes:
+      - application/json
+      description: Update user email based on the authenticated user
+      parameters:
+      - description: Update email request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/UserUpdateEmailRequest'
+      - default: jwt <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User data
+          schema:
+            $ref: '#/definitions/UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            properties:
+              message:
+                type: string
+              status:
+                type: boolean
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            properties:
+              message:
+                type: string
+              status:
+                type: boolean
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            properties:
+              message:
+                type: string
+              status:
+                type: boolean
+            type: object
+      security:
+      - jwtToken: []
+      summary: Update user email
+      tags:
+      - Users
+securityDefinitions:
+  jwtToken:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
