@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/meisbokai/GolangApiTest/internal/http/routes"
+	"github.com/meisbokai/GolangApiTest/internal/util"
 )
 
 type App struct {
@@ -14,12 +15,20 @@ type App struct {
 }
 
 func NewServerApp() (*App, error) {
+
+	// Setup database
+	conn, err := util.SetupPostgresConnection()
+	if err != nil {
+		return nil, err
+	}
+
 	// Setup router
 	router := setupRouter()
 
 	// API Routes
 	api := router.Group("api")
 	api.GET("/", routes.RootHandler)
+	routes.NewUsersRoute(api, conn).Routes()
 
 	// http Server
 	server := &http.Server{

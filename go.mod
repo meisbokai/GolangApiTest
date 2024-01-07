@@ -3,6 +3,11 @@ module github.com/meisbokai/GolangApiTest
 go 1.21.5
 
 require (
+	github.com/jmoiron/sqlx v1.3.5
+	github.com/lib/pq v1.10.9
+)
+
+require (
 	github.com/bytedance/sonic v1.9.1 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
