@@ -95,3 +95,22 @@ func (userHandler UserHandler) UpdateUserEmail(ctx *gin.Context) {
 	NewSuccessResponse(ctx, statusCode, "Update success", responses.FromV1Domain(userDom))
 
 }
+
+func (userHandler UserHandler) DeleteUser(ctx *gin.Context) {
+	ctxx := ctx.Request.Context()
+	email := ctx.Query("email")
+	// TODO: Find another way to get identifier. Email is not unique.
+
+	user, statusCode, err := userHandler.usecase.DeleteUser(ctxx, email)
+	if err != nil {
+		NewErrorResponse(ctx, statusCode, err.Error())
+		return
+	}
+
+	// userResponse := responses.FromV1Domain(userDom)
+
+	NewSuccessResponse(ctx, statusCode, "user deleted", map[string]interface{}{
+		"user": user.Username,
+	})
+
+}

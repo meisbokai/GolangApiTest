@@ -35,6 +35,7 @@ func (r *usersRoutes) Routes() {
 		V1UserRoute.GET("/all", r.V1Handler.GetAllUserData)
 		V1UserRoute.GET("/email", r.V1Handler.GetUserByEmail)
 		V1UserRoute.PUT("/updateEmail", r.V1Handler.UpdateUserEmail)
+		V1UserRoute.DELETE("/delete", r.V1Handler.DeleteUser)
 
 	}
 
